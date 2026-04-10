@@ -1,52 +1,58 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:grocery/env.dart';
+import 'package:grocery/database_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginSignUpApi{
-  static const String _baseUrl = "${Env.baseUrl}/api/Account";
-
   Future<bool> signUpUser(String email, String password, String confirmPassword, String mobileNo) async {
-    final url = Uri.parse("$_baseUrl/register");
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
+    try {
+      final db = await DatabaseHelper.instance.database;
+      final existingUser = await db.query(
+        'users',
+        where: 'email = ?',
+        whereArgs: [email],
+      );
+
+      if (existingUser.isNotEmpty) {
+        return false; // User already exists
+      }
+
+      int id = await db.insert('users', {
         'email': email,
         'password': password,
         'confirmPassword': confirmPassword,
         'mobileNo': mobileNo,
-      }),
-    );
+        'isActive': 1,
+      });
 
-    return response.statusCode == 200;
-  }
-
-  Future<bool> loginUser(String email, String password) async {
-    final url = Uri.parse("$_baseUrl/Login");
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'password': password,  // ✅ Corrected key
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print(data);
-      final prefs = await SharedPreferences.getInstance();
-
-      prefs.setString('userEmail', data['email']);
-      prefs.setInt("hostID", data['hostId']);
-      prefs.setBool('isLoggedIn', true);
-
-      return true;
-    } else {
+      return id > 0;
+    } catch (e) {
+      print(e);
       return false;
     }
   }
 
+  Future<bool> loginUser(String email, String password) async {
+    try {
+      final db = await DatabaseHelper.instance.database;
+      final result = await db.query(
+        'users',
+        where: 'email = ? AND password = ?',
+        whereArgs: [email, password],
+      );
 
+      if (result.isNotEmpty) {
+        final data = result.first;
+        final prefs = await SharedPreferences.getInstance();
+
+        prefs.setString('userEmail', data['email'] as String);
+        prefs.setInt("hostID", data['hostId'] as int);
+        prefs.setBool('isLoggedIn', true);
+
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
 }
