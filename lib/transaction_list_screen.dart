@@ -90,7 +90,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   child: _ActionTile(
                     icon: Icons.edit_outlined,
                     label: 'Edit',
-                    color: const Color(0xFF7C3AED),
+                    color: const Color(0xFF1E293B),
                     onTap: () async {
                       Navigator.pop(ctx);
                       final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionFormScreen(eventID: widget.eventId, eventName: widget.eventName, map: tx)));

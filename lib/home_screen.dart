@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _BottomSheetAction(
               icon: Icons.edit_outlined,
               label: 'Edit Event',
-              color: const Color(0xFF7C3AED),
+              color: const Color(0xFF1E293B),
               onTap: () {
                 Navigator.pop(ctx);
                 Navigator.push(context, MaterialPageRoute(builder: (_) => EventFormScreen(map: event))).then((value) {

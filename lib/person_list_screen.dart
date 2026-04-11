@@ -56,7 +56,7 @@ class _PersonListScreenState extends State<PersonListScreen> {
             _ActionTile(
               icon: Icons.edit_outlined,
               label: 'Edit Member info',
-              color: const Color(0xFF7C3AED),
+              color: const Color(0xFF1E293B),
               onTap: () async {
                 Navigator.pop(ctx);
                 final result = await Navigator.push(
