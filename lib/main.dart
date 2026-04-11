@@ -65,8 +65,8 @@ class MyApp extends StatelessWidget {
               surface: Colors.white,
             ),
             appBarTheme: const AppBarTheme(
-              backgroundColor: Color(0xFFF8FAFC),
-              foregroundColor: Color(0xFF0F172A),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.white,
               elevation: 0,
             ),
             floatingActionButtonTheme: const FloatingActionButtonThemeData(
