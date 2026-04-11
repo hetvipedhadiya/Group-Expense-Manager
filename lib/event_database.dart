@@ -1,7 +1,7 @@
-import 'package:grocery/Models/InsertEventModel.dart';
+import 'package:grocery/models/insert_event_model.dart';
 import 'package:grocery/database_helper.dart';
 
-class EventApi {
+class EventDatabase {
   Future<List> getAllEvent() async {
     try {
       final db = await DatabaseHelper.instance.database;
@@ -95,3 +95,5 @@ class EventApi {
     }
   }
 }
+
+

@@ -1,22 +1,22 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:grocery/Models/TransactionModel.dart';
-import 'package:grocery/TransactionAPI.dart';
+import 'package:grocery/models/transaction_model.dart';
+import 'package:grocery/transaction_database.dart';
 import 'package:grocery/theme_manager.dart';
 import 'package:intl/intl.dart';
 
-class TransactionForm extends StatefulWidget {
+class TransactionFormScreen extends StatefulWidget {
   final String eventName;
   final Map<String, dynamic>? map;
   final int eventID;
 
-  TransactionForm({this.map, required this.eventName, required this.eventID});
+  TransactionFormScreen({this.map, required this.eventName, required this.eventID});
 
   @override
-  State<TransactionForm> createState() => _TransactionFormState();
+  State<TransactionFormScreen> createState() => _TransactionFormScreenState();
 }
 
-class _TransactionFormState extends State<TransactionForm> with TickerProviderStateMixin {
+class _TransactionFormScreenState extends State<TransactionFormScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   String _transactionType = 'debit';
   final _amountController = TextEditingController();
@@ -48,7 +48,7 @@ class _TransactionFormState extends State<TransactionForm> with TickerProviderSt
   }
 
   Future<void> _fetchUsers() async {
-    final users = await TransactionAPI().getUserDropdown(widget.eventID);
+    final users = await TransactionDatabase().getUserDropdown(widget.eventID);
     if (mounted) setState(() => _users = users);
   }
 
@@ -79,8 +79,8 @@ class _TransactionFormState extends State<TransactionForm> with TickerProviderSt
     );
 
     final success = widget.map != null 
-        ? await TransactionAPI().updateTransaction(model, widget.map!['expenseID']) 
-        : await TransactionAPI().insertTransaction(model);
+        ? await TransactionDatabase().updateTransaction(model, widget.map!['expenseID']) 
+        : await TransactionDatabase().insertTransaction(model);
 
     if (success) Navigator.of(context).pop(true);
     setState(() => _isLoading = false);
@@ -143,9 +143,9 @@ class _TransactionFormState extends State<TransactionForm> with TickerProviderSt
                   _buildDatePicker(context, secondaryBg, isLight),
                   const SizedBox(height: 32),
 
-                  _label('DESCRIPTION', isLight),
+                  _label('DESCRIPTION (OPTIONAL)', isLight),
                   const SizedBox(height: 12),
-                  _buildInputField(controller: _descriptionController, icon: Icons.short_text, hint: 'Details...', maxLines: 3, bg: secondaryBg, isLight: isLight),
+                  _buildInputField(controller: _descriptionController, icon: Icons.short_text, hint: 'Details...', maxLines: 3, bg: secondaryBg, isLight: isLight, isRequired: false),
                   const SizedBox(height: 40),
 
                   // SUBMIT BUTTON
@@ -202,7 +202,7 @@ class _TransactionFormState extends State<TransactionForm> with TickerProviderSt
     );
   }
 
-  Widget _buildInputField({required TextEditingController controller, required Color bg, required bool isLight, required IconData icon, required String hint, TextInputType keyboardType = TextInputType.text, int maxLines = 1}) {
+  Widget _buildInputField({required TextEditingController controller, required Color bg, required bool isLight, required IconData icon, required String hint, TextInputType keyboardType = TextInputType.text, int maxLines = 1, bool isRequired = true}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(16)),
@@ -216,7 +216,7 @@ class _TransactionFormState extends State<TransactionForm> with TickerProviderSt
           prefixIcon: Icon(icon, color: isLight ? const Color(0xFF1E293B) : Colors.white70, size: 22),
           contentPadding: const EdgeInsets.symmetric(vertical: 20),
         ),
-        validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+        validator: isRequired ? (v) => (v == null || v.isEmpty) ? 'Required' : null : null,
       ),
     );
   }
@@ -265,3 +265,5 @@ class _TypeToggle extends StatelessWidget {
     );
   }
 }
+
+

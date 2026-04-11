@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:grocery/LoginSignupApi.dart';
-import 'package:grocery/NewScreen.dart';
-import 'package:grocery/SignUp.dart';
+import 'package:grocery/auth_database.dart';
+import 'package:grocery/home_screen.dart';
+import 'package:grocery/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -52,14 +52,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     }
 
     setState(() => _isLoading = true);
-    final success = await LoginSignUpApi().loginUser(email, password);
+    final success = await AuthDatabase().loginUser(email, password);
     setState(() => _isLoading = false);
 
     if (success) {
       _showSnackBar('Welcome back! 🎉');
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => NewScreen(),
+          pageBuilder: (_, __, ___) => HomeScreen(),
           transitionsBuilder: (_, anim, __, child) =>
               FadeTransition(opacity: anim, child: child),
           transitionDuration: const Duration(milliseconds: 500),
@@ -243,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             ),
                             TextButton(
                               onPressed: () => Navigator.of(context).push(
-                                MaterialPageRoute(builder: (_) => const SignUp()),
+                                MaterialPageRoute(builder: (_) => const SignUpScreen()),
                               ),
                               child: const Text(
                                 'Sign Up',
@@ -399,3 +399,5 @@ class _GradientButton extends StatelessWidget {
     );
   }
 }
+
+

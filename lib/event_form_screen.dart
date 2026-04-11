@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:grocery/Event_Api.dart';
-import 'package:grocery/Models/InsertEventModel.dart';
+import 'package:grocery/event_database.dart';
+import 'package:grocery/models/insert_event_model.dart';
 import 'package:grocery/theme_manager.dart';
 import 'package:intl/intl.dart';
 
-class CreateEventScreen extends StatefulWidget {
+class EventFormScreen extends StatefulWidget {
   final Map<String, dynamic>? map;
-  CreateEventScreen({this.map});
+  EventFormScreen({this.map});
 
   @override
-  _CreateEventScreenState createState() => _CreateEventScreenState();
+  _EventFormScreenState createState() => _EventFormScreenState();
 }
 
-class _CreateEventScreenState extends State<CreateEventScreen> with TickerProviderStateMixin {
+class _EventFormScreenState extends State<EventFormScreen> with TickerProviderStateMixin {
   final TextEditingController _eventNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey();
   DateTime? _selectedDate;
@@ -76,13 +76,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> with TickerProvid
           eventName: _eventNameController.text.trim(),
           eventDate: _selectedDate!,
         );
-        success = await EventApi().updateData(event, widget.map!['eventID']);
+        success = await EventDatabase().updateData(event, widget.map!['eventID']);
       } else {
         final event = Event(
           eventName: _eventNameController.text.trim(),
           eventDate: _selectedDate!,
         );
-        success = await EventApi().insertEvent(event);
+        success = await EventDatabase().insertEvent(event);
       }
       if (success) Navigator.of(context).pop(true);
     } finally {
@@ -223,3 +223,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> with TickerProvid
     );
   }
 }
+
+
+

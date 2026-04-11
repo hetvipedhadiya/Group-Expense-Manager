@@ -1,7 +1,7 @@
-import 'package:grocery/Models/TransactionReportModel.dart'; 
+import 'package:grocery/models/transaction_report_model.dart'; 
 import 'package:grocery/database_helper.dart';
 
-class ReportAPI {
+class ReportDatabase {
   Future<Map<String, dynamic>> getAllReport(int eventID) async {
     try {
       const int hostId = 1;
@@ -62,3 +62,5 @@ class ReportAPI {
     }
   }
 }
+
+

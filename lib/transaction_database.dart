@@ -1,7 +1,7 @@
-import 'package:grocery/Models/TransactionModel.dart';
+import 'package:grocery/models/transaction_model.dart';
 import 'package:grocery/database_helper.dart';
 
-class TransactionAPI {
+class TransactionDatabase {
   Future<List<TransactionModel>> getAllTransaction() async {
     try {
       final db = await DatabaseHelper.instance.database;
@@ -105,3 +105,5 @@ class TransactionAPI {
     }
   }
 }
+
+

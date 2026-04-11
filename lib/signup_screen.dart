@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:grocery/LoginPage.dart';
-import 'package:grocery/LoginSignupApi.dart';
+import 'package:grocery/login_screen.dart';
+import 'package:grocery/auth_database.dart';
 
-class SignUp extends StatefulWidget {
-  const SignUp({Key? key}) : super(key: key);
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
+class _SignUpScreenState extends State<SignUpScreen> with TickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _mobileController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -85,7 +85,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
     }
 
     setState(() => _isLoading = true);
-    final success = await LoginSignUpApi().signUpUser(email, password, confirmPassword, mobile);
+    final success = await AuthDatabase().signUpUser(email, password, confirmPassword, mobile);
     setState(() => _isLoading = false);
 
     if (success) {
@@ -401,3 +401,6 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
     );
   }
 }
+
+
+

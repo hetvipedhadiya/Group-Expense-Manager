@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:grocery/ReportAPI.dart';
-import 'package:grocery/TransactionAPI.dart';
+import 'package:grocery/report_database.dart';
+import 'package:grocery/transaction_database.dart';
 import 'package:grocery/theme_manager.dart';
 import 'package:intl/intl.dart';
 
@@ -31,9 +31,9 @@ class _ReportScreenState extends State<ReportScreen> with TickerProviderStateMix
   Future<void> _loadAll() async {
     if (mounted) setState(() => _isLoading = true);
     try {
-      final data = await ReportAPI().getAllReport(widget.eventId);
-      final members = await ReportAPI().getTransactionodMember(widget.eventId);
-      final txns = await TransactionAPI().getTransactionByEvent(widget.eventId);
+      final data = await ReportDatabase().getAllReport(widget.eventId);
+      final members = await ReportDatabase().getTransactionodMember(widget.eventId);
+      final txns = await TransactionDatabase().getTransactionByEvent(widget.eventId);
       if (mounted) {
         setState(() {
           _reportData = data;
@@ -344,3 +344,4 @@ class _LegendItem extends StatelessWidget {
     );
   }
 }
+

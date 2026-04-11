@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:grocery/NewScreen.dart';
+import 'package:grocery/home_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -32,10 +32,10 @@ class WelcomeScreen extends StatelessWidget {
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                // Navigating to NewScreen with a default eventName
+                // Navigating to HomeScreen with a default eventName
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => NewScreen()
+                    builder: (context) => HomeScreen()
                   ),
                 );
               },
@@ -54,3 +54,5 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 }
+
+

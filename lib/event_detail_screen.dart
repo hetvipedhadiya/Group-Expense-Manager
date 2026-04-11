@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:grocery/PersonScreen.dart';
-import 'package:grocery/ReportAPI.dart';
-import 'package:grocery/ReportScreen.dart';
-import 'package:grocery/TransactionAPI.dart';
-import 'package:grocery/TransactionScreen.dart';
-import 'package:grocery/savePDF.dart';
+import 'package:grocery/person_list_screen.dart';
+import 'package:grocery/report_database.dart';
+import 'package:grocery/report_screen.dart';
+import 'package:grocery/transaction_database.dart';
+import 'package:grocery/transaction_list_screen.dart';
+import 'package:grocery/save_pdf.dart';
 import 'package:grocery/theme_manager.dart';
 import 'package:pdf/pdf.dart';
 import 'dart:io';
 import 'package:pdf/widgets.dart' as pw;
 
-class ExpenseDetail extends StatefulWidget {
+class EventDetailScreen extends StatefulWidget {
   final String eventName;
   final int eventId;
 
-  ExpenseDetail({required this.eventName, required this.eventId});
+  EventDetailScreen({required this.eventName, required this.eventId});
 
   @override
-  State<ExpenseDetail> createState() => _ExpenseDetailState();
+  State<EventDetailScreen> createState() => _EventDetailScreenState();
 }
 
-class _ExpenseDetailState extends State<ExpenseDetail>
+class _EventDetailScreenState extends State<EventDetailScreen>
     with SingleTickerProviderStateMixin {
   Map<String, dynamic> _reportData = {};
   List<Map<String, dynamic>> _reportMemberData = [];
@@ -49,7 +49,7 @@ class _ExpenseDetailState extends State<ExpenseDetail>
   Future<void> _fetchTransactions() async {
     try {
       final transactions =
-          await TransactionAPI().getTransactionByEvent(widget.eventId);
+          await TransactionDatabase().getTransactionByEvent(widget.eventId);
       if (mounted) setState(() => _transactions = transactions);
     } catch (e) {
       print("Error: $e");
@@ -58,7 +58,7 @@ class _ExpenseDetailState extends State<ExpenseDetail>
 
   Future<void> _fetchMember() async {
     try {
-      final data = await ReportAPI().getTransactionodMember(widget.eventId);
+      final data = await ReportDatabase().getTransactionodMember(widget.eventId);
       if (mounted) setState(() => _reportMemberData = data);
     } catch (e) {
       print("Error: $e");
@@ -67,7 +67,7 @@ class _ExpenseDetailState extends State<ExpenseDetail>
 
   Future<void> _fetchReportScreen() async {
     try {
-      final data = await ReportAPI().getAllReport(widget.eventId);
+      final data = await ReportDatabase().getAllReport(widget.eventId);
       if (mounted) setState(() => _reportData = data);
     } catch (e) {
       print("Error: $e");
@@ -142,7 +142,7 @@ class _ExpenseDetailState extends State<ExpenseDetail>
         child: TabBarView(
           controller: _tabController,
           children: [
-            PersonScreen(eventName: widget.eventName, eventId: widget.eventId),
+            PersonListScreen(eventName: widget.eventName, eventId: widget.eventId),
             DashboardScreen(eventName: widget.eventName, eventId: widget.eventId),
             ReportScreen(eventId: widget.eventId, eventName: widget.eventName),
           ],
@@ -195,3 +195,6 @@ class PdfReportAPI {
     return file;
   }
 }
+
+
+

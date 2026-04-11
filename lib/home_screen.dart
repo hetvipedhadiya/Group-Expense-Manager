@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:grocery/DeveloperScreenPage.dart';
-import 'package:grocery/Event_Api.dart';
-import 'package:grocery/ExpenseDetail.dart';
-import 'package:grocery/FormScreen.dart';
+import 'package:grocery/developer_screen.dart';
+import 'package:grocery/event_database.dart';
+import 'package:grocery/event_detail_screen.dart';
+import 'package:grocery/event_form_screen.dart';
 import 'package:grocery/theme_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
-class NewScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   @override
-  State<NewScreen> createState() => _NewScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _NewScreenState extends State<NewScreen> with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<List<dynamic>>? _futureEvents;
   bool _showAllEvents = false;
 
   @override
   void initState() {
     super.initState();
-    _futureEvents = EventApi().fetchEventsByHostId();
+    _futureEvents = EventDatabase().fetchEventsByHostId();
   }
 
   void _refreshEvents() {
     setState(() {
-      _futureEvents = EventApi().fetchEventsByHostId();
+      _futureEvents = EventDatabase().fetchEventsByHostId();
     });
   }
 
@@ -53,7 +53,7 @@ class _NewScreenState extends State<NewScreen> with TickerProviderStateMixin {
               color: const Color(0xFF7C3AED),
               onTap: () {
                 Navigator.pop(ctx);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => CreateEventScreen(map: event))).then((value) {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => EventFormScreen(map: event))).then((value) {
                   if (value == true) _refreshEvents();
                 });
               },
@@ -83,12 +83,12 @@ class _NewScreenState extends State<NewScreen> with TickerProviderStateMixin {
         backgroundColor: isLight ? Colors.white : const Color(0xFF1A1040),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Delete Event?', style: TextStyle(color: isLight ? const Color(0xFF0F172A) : Colors.white, fontWeight: FontWeight.bold)),
-        content: Text('Are you sure you want to delete "${event['eventName']}"?', style: TextStyle(color: isLight ? Colors.black54 : const Color(0xFF9580C4))),
+        content: Text('Are you sure you want to delete "${event['eventName']}" You will lose all person and Transaction Data?', style: TextStyle(color: isLight ? Colors.black54 : const Color(0xFF9580C4))),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: isLight ? Colors.black45 : const Color(0xFF8B7EC8)))),
           TextButton(onPressed: () async {
             Navigator.pop(ctx);
-            bool deleted = await EventApi().deleteEvent(event['eventID']);
+            bool deleted = await EventDatabase().deleteEvent(event['eventID']);
             if (deleted) _refreshEvents();
           }, child: const Text('Delete', style: TextStyle(color: Colors.redAccent))),
         ],
@@ -124,7 +124,7 @@ class _NewScreenState extends State<NewScreen> with TickerProviderStateMixin {
                   child: Stack(
                     children: [
                       Positioned(right: -50, top: -50, child: CircleAvatar(radius: 120, backgroundColor: Colors.white.withOpacity(0.03))),
-                      Positioned(left: 30, top: 100, child: Opacity(opacity: 0.05, child: Icon(Icons.cloud_outlined, size: 100, color: Colors.white))),
+                      Positioned(right: 20, top: 60, child: Opacity(opacity: 0.1, child: Icon(Icons.show_chart, size: 140, color: Colors.white))),
                       SafeArea(
                         child: Padding(
                           padding: const EdgeInsets.all(24),
@@ -136,9 +136,9 @@ class _NewScreenState extends State<NewScreen> with TickerProviderStateMixin {
                                 children: [
                                   _HeaderActionBtn(icon: Icons.share_outlined, onTap: () => Share.share('Join me on Expense Manager!')),
                                   const SizedBox(width: 8),
-                                  _HeaderActionBtn(icon: isLight ? Icons.dark_mode_outlined : Icons.light_mode_outlined, onTap: () => ThemeManager.instance.toggleTheme().then((_) => setState(() {}))),
-                                  const SizedBox(width: 8),
-                                  _HeaderActionBtn(icon: Icons.info_outline, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DeveloperScreenPage()))),
+                                    _HeaderActionBtn(icon: Icons.info_outline, onTap: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (_) => const AppDeveloperScreen()));
+                                    }),
                                 ],
                               ),
                               const Spacer(),
@@ -160,23 +160,39 @@ class _NewScreenState extends State<NewScreen> with TickerProviderStateMixin {
                     offset: const Offset(0, -60),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 24),
-                      padding: const EdgeInsets.all(28),
+                      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
                       decoration: BoxDecoration(
-                        color: isLight ? Colors.white : const Color(0xFF1E293B),
-                        borderRadius: BorderRadius.circular(32),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(isLight ? 0.08 : 0.3),
-                            blurRadius: 24,
-                            offset: const Offset(0, 12),
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           )
                         ],
                       ),
                       child: Row(
                         children: [
-                          _SummaryStat(label: 'Total Events', value: '${events.length}', color: const Color(0xFF6366F1), icon: Icons.event_note, isLight: isLight),
-                          Container(width: 1, height: 40, color: isLight ? Colors.black.withOpacity(0.05) : Colors.white.withOpacity(0.1)),
-                          _SummaryStat(label: 'Total Amount', value: '₹${NumberFormat("#,##0", "en_IN").format(totalAmount)}', color: const Color(0xFF10B981), icon: Icons.payments_outlined, isLight: isLight),
+                          _SummaryStat(
+                            label: 'Total Events',
+                            value: '${events.length}',
+                            color: const Color(0xFF3B82F6),
+                            icon: Icons.calendar_today_outlined,
+                            isLight: true,
+                          ),
+                          Container(
+                            width: 1,
+                            height: 50,
+                            color: Colors.black.withOpacity(0.05),
+                          ),
+                          _SummaryStat(
+                            label: 'Total Amount',
+                            value: '₹ ${NumberFormat("#,##0", "en_IN").format(totalAmount)}',
+                            color: const Color(0xFF10B981),
+                            icon: Icons.account_balance_wallet_outlined,
+                            isLight: true,
+                          ),
                         ],
                       ),
                     ),
@@ -190,10 +206,10 @@ class _NewScreenState extends State<NewScreen> with TickerProviderStateMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(_showAllEvents ? 'All Events' : 'Recent Events', style: TextStyle(color: isLight ? const Color(0xFF1E293B) : Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                      Text(_showAllEvents ? 'All Events' : 'Recent Events', style: TextStyle(color: isLight ? const Color(0xFF1E293B) : Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
                       TextButton(
                         onPressed: () => setState(() => _showAllEvents = !_showAllEvents),
-                        child: Text(_showAllEvents ? 'Show Less' : 'View All', style: const TextStyle(color: Colors.lightBlue, fontWeight: FontWeight.w800)),
+                        child: Text(_showAllEvents ? 'Show Less' : 'View All', style: const TextStyle(color: Color(0xFF3B82F6), fontWeight: FontWeight.w600, fontSize: 16)),
                       ),
                     ],
                   ),
@@ -210,8 +226,9 @@ class _NewScreenState extends State<NewScreen> with TickerProviderStateMixin {
                         event: events[i],
                         index: i,
                         isLight: isLight,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ExpenseDetail(eventName: events[i]['eventName'], eventId: events[i]['eventID']))).then((_) => _refreshEvents()),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EventDetailScreen(eventName: events[i]['eventName'], eventId: events[i]['eventID']))).then((_) => _refreshEvents()),
                         onLongPress: () => _showEventActions(context, events[i]),
+                        onDoubleTap: () => _showEventActions(context, events[i]),
                       );
                     },
                     childCount: itemsToShowCount,
@@ -222,12 +239,16 @@ class _NewScreenState extends State<NewScreen> with TickerProviderStateMixin {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CreateEventScreen())).then((val) { if (val == true) _refreshEvents(); }),
-        backgroundColor: const Color(0xFF1E293B),
-        icon: const Icon(Icons.add_circle_outline, color: Colors.white),
-        label: const Text('Add Event', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 10, right: 10),
+        child: FloatingActionButton.extended(
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EventFormScreen())).then((val) { if (val == true) _refreshEvents(); }),
+          backgroundColor: const Color(0xFF1E293B),
+          elevation: 8,
+          icon: const Icon(Icons.add, color: Colors.white, size: 28),
+          label: const Text('Add Event', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
       ),
     );
   }
@@ -238,9 +259,17 @@ class _AnimatedEventCard extends StatefulWidget {
   final int index;
   final bool isLight;
   final VoidCallback onTap;
-  final VoidCallback onLongPress;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onDoubleTap;
 
-  const _AnimatedEventCard({required this.event, required this.index, required this.isLight, required this.onTap, required this.onLongPress});
+  const _AnimatedEventCard({
+    required this.event,
+    required this.index,
+    required this.isLight,
+    required this.onTap,
+    this.onLongPress,
+    this.onDoubleTap,
+  });
 
   @override
   State<_AnimatedEventCard> createState() => _AnimatedEventCardState();
@@ -292,33 +321,49 @@ class _AnimatedEventCardState extends State<_AnimatedEventCard> with SingleTicke
             child: InkWell(
               onTap: widget.onTap,
               onLongPress: widget.onLongPress,
+              onDoubleTap: widget.onDoubleTap,
               borderRadius: BorderRadius.circular(24),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(color: widget.isLight ? const Color(0xFFF1F5F9) : Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(16)),
-                      child: Icon(Icons.wallet_outlined, color: widget.isLight ? const Color(0xFF1E293B) : Colors.white70, size: 24),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: widget.isLight ? const Color(0xFFF8FAFC) : Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.wallet, color: const Color(0xFF1E293B), size: 22),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(ev['eventName'] ?? '', style: TextStyle(color: widget.isLight ? const Color(0xFF1E293B) : Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text(ev['eventName'] ?? '', style: TextStyle(color: widget.isLight ? const Color(0xFF1E293B) : Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
                           const SizedBox(height: 4),
-                          Text(dateStr, style: TextStyle(color: widget.isLight ? Colors.black26 : Colors.white38, fontSize: 12, fontWeight: FontWeight.w600)),
+                          Text(dateStr, style: TextStyle(color: Colors.black45, fontSize: 13, fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('₹${NumberFormat("#,##0", "en_IN").format(ev['amount'] ?? 0)}', style: TextStyle(color: widget.isLight ? const Color(0xFF1E293B) : Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
-                        const SizedBox(height: 4),
-                        Icon(Icons.arrow_forward_ios, size: 12, color: widget.isLight ? Colors.black12 : Colors.white10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('₹${NumberFormat("#,##0", "en_IN").format(ev['amount'] ?? 0)}',
+                                style: TextStyle(
+                                  color: widget.isLight ? const Color(0xFF1E293B) : Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.5,
+                                )),
+                            const SizedBox(height: 6),
+                            Icon(Icons.arrow_forward_ios, size: 12, color: widget.isLight ? Colors.black.withOpacity(0.1) : Colors.white10),
+                          ],
+                        ),
                       ],
                     ),
                   ],
@@ -352,9 +397,9 @@ class _SummaryStat extends StatelessWidget {
             child: Icon(icon, color: color, size: 20),
           ),
           const SizedBox(height: 12),
-          Text(value, style: TextStyle(color: isLight ? const Color(0xFF1E293B) : const Color(0xFF0F172A), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+          Text(value, style: TextStyle(color: const Color(0xFF1E293B), fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: isLight ? Colors.black38 : Colors.black54, fontSize: 12, fontWeight: FontWeight.bold)),
+          Text(label, style: TextStyle(color: Colors.black45, fontSize: 12, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -406,3 +451,6 @@ class _BottomSheetAction extends StatelessWidget {
     );
   }
 }
+
+
+

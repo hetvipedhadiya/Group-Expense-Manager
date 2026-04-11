@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:grocery/Person_Api.dart';
-import 'package:grocery/TransactionAPI.dart';
-import 'package:grocery/TransactionForm.dart';
+import 'package:grocery/person_database.dart';
+import 'package:grocery/transaction_database.dart';
+import 'package:grocery/transaction_form_screen.dart';
 import 'package:grocery/theme_manager.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -28,11 +28,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   }
 
   Future<void> _loadPersons() async {
-    final persons = await PersonApi().getPersonsByEvent(widget.eventId);
+    final persons = await PersonDatabase().getPersonsByEvent(widget.eventId);
     if (mounted) setState(() => _persons = persons);
   }
 
-  Future<List<dynamic>> _fetchTransactions() => TransactionAPI().getTransactionByEvent(widget.eventId);
+  Future<List<dynamic>> _fetchTransactions() => TransactionDatabase().getTransactionByEvent(widget.eventId);
 
   void _refreshTransactions() {
     setState(() {
@@ -56,29 +56,64 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(width: 40, height: 4, decoration: BoxDecoration(color: isLight ? Colors.black12 : Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
-            const SizedBox(height: 20),
-            _ActionTile(
-              icon: Icons.edit_outlined,
-              label: 'Edit Transaction',
-              color: const Color(0xFF7C3AED),
-              onTap: () async {
-                Navigator.pop(ctx);
-                final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionForm(eventID: widget.eventId, eventName: widget.eventName, map: tx)));
-                if (result == true) _refreshTransactions();
-              },
+            const SizedBox(height: 24),
+            // TRANSACTION DETAILS HEADER IN POPUP
+            Row(
+              children: [
+                CircleAvatar(backgroundColor: tx['transactionType'] == 'credit' ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1), child: Icon(tx['transactionType'] == 'credit' ? Icons.south_west : Icons.north_east, color: tx['transactionType'] == 'credit' ? Colors.green : Colors.red, size: 20)),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tx['userName'] ?? 'Member', style: TextStyle(color: isLight ? const Color(0xFF1E293B) : Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text(DateFormat('MMM dd, yyyy').format(DateTime.parse(tx['transactionDate'] ?? DateTime.now().toString())), style: TextStyle(color: isLight ? Colors.black38 : Colors.white38, fontSize: 13)),
+                    ],
+                  ),
+                ),
+                Text('₹${tx['amount']}', style: TextStyle(color: isLight ? const Color(0xFF1E293B) : Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
+              ],
             ),
-            const SizedBox(height: 12),
-            _ActionTile(
-              icon: Icons.delete_outline,
-              label: 'Delete Transaction',
-              color: Colors.redAccent,
-              onTap: () async {
-                Navigator.pop(ctx);
-                final deleted = await TransactionAPI().deleteTransaction(tx['expenseID']);
-                if (deleted) _refreshTransactions();
-              },
+            if (tx['description'] != null && tx['description'].toString().isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: isLight ? const Color(0xFFF1F5F9) : Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(16)),
+                child: Text(tx['description'], style: TextStyle(color: isLight ? Colors.black54 : Colors.white70, fontSize: 14, height: 1.4)),
+              ),
+            ],
+            const SizedBox(height: 28),
+            Row(
+              children: [
+                Expanded(
+                  child: _ActionTile(
+                    icon: Icons.edit_outlined,
+                    label: 'Edit',
+                    color: const Color(0xFF7C3AED),
+                    onTap: () async {
+                      Navigator.pop(ctx);
+                      final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionFormScreen(eventID: widget.eventId, eventName: widget.eventName, map: tx)));
+                      if (result == true) _refreshTransactions();
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _ActionTile(
+                    icon: Icons.delete_outline,
+                    label: 'Delete',
+                    color: Colors.redAccent,
+                    onTap: () async {
+                      Navigator.pop(ctx);
+                      final deleted = await TransactionDatabase().deleteTransaction(tx['expenseID']);
+                      if (deleted) _refreshTransactions();
+                    },
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -144,6 +179,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           index: i,
                           onTap: () => _showTransactionActions(transactions[i]),
                           isLight: isLight,
+                          isDetailed: _showAll,
                         );
                       },
                       childCount: itemsToShow,
@@ -162,7 +198,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please add a member first!')));
               return;
             }
-            Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionForm(eventID: widget.eventId, eventName: widget.eventName, map: null))).then((val) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionFormScreen(eventID: widget.eventId, eventName: widget.eventName, map: null))).then((val) {
               if (val == true) _refreshTransactions();
             });
           },
@@ -250,8 +286,9 @@ class _AnimatedTransactionCard extends StatefulWidget {
   final int index;
   final VoidCallback onTap;
   final bool isLight;
+  final bool isDetailed;
 
-  const _AnimatedTransactionCard({required this.tx, required this.index, required this.onTap, required this.isLight});
+  const _AnimatedTransactionCard({required this.tx, required this.index, required this.onTap, required this.isLight, this.isDetailed = false});
 
   @override
   State<_AnimatedTransactionCard> createState() => _AnimatedTransactionCardState();
@@ -317,7 +354,16 @@ class _AnimatedTransactionCardState extends State<_AnimatedTransactionCard> with
               ),
             ),
             title: Text(tx['userName'] ?? 'Member', style: TextStyle(color: widget.isLight ? const Color(0xFF1E293B) : Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-            subtitle: Text(formattedDate, style: TextStyle(color: widget.isLight ? Colors.black26 : Colors.white38, fontSize: 12)),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(formattedDate, style: TextStyle(color: widget.isLight ? Colors.black26 : Colors.white38, fontSize: 12)),
+                if (widget.isDetailed && tx['description'] != null && tx['description'].toString().isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(tx['description'], maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: widget.isLight ? Colors.black45 : Colors.white54, fontSize: 13)),
+                ],
+              ],
+            ),
             trailing: Text(
               '${isCredit ? '+' : '-'} ₹${NumberFormat("#,##0", "en_IN").format(amount)}',
               style: TextStyle(
@@ -363,3 +409,5 @@ class _ActionTile extends StatelessWidget {
     );
   }
 }
+
+

@@ -1,6 +1,6 @@
 // import 'package:fl_chart/fl_chart.dart';
 // import 'package:flutter/material.dart';
-// import 'package:grocery/Models/TransactionReportModel.dart';
+// import 'package:grocery/models/transaction_report_model.dart';
 //
 // List<PieChartSectionData> getSections(int touchedIndex) => PieData().data
 //     .asMap()

@@ -1,13 +1,13 @@
 // import 'package:fl_chart/fl_chart.dart';
 // import 'package:flutter/material.dart';
-// import 'package:grocery/pieChartSection.dart';
+// import 'package:grocery/pie_chart_section.dart';
 //
-// class PieChartPage extends StatefulWidget {
+// class PieChartScreen extends StatefulWidget {
 //   @override
 //   State<StatefulWidget> createState() => PieChartPageState();
 // }
 //
-// class PieChartPageState extends State<PieChartPage> {
+// class PieChartPageState extends State<PieChartScreen> {
 //   int touchedIndex =0;
 //
 //   @override
@@ -50,3 +50,4 @@
 //     ),
 //   );
 // }
+

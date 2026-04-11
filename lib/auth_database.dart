@@ -1,7 +1,7 @@
 import 'package:grocery/database_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginSignUpApi{
+class AuthDatabase{
   Future<bool> signUpUser(String email, String password, String confirmPassword, String mobileNo) async {
     try {
       final db = await DatabaseHelper.instance.database;

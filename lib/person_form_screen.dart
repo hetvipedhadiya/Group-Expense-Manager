@@ -1,22 +1,22 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:grocery/Models/PersonModel.dart';
-import 'package:grocery/Person_Api.dart';
+import 'package:grocery/models/person_model.dart';
+import 'package:grocery/person_database.dart';
 import 'package:grocery/theme_manager.dart';
 import 'package:image_picker/image_picker.dart';
 
-class PersonForm extends StatefulWidget {
+class PersonFormScreen extends StatefulWidget {
   final String eventName;
   final Map<String, dynamic>? map;
   final int eventID;
 
-  PersonForm({this.map, required this.eventName, required this.eventID});
+  PersonFormScreen({this.map, required this.eventName, required this.eventID});
 
   @override
-  State<PersonForm> createState() => _PersonFormState();
+  State<PersonFormScreen> createState() => _PersonFormScreenState();
 }
 
-class _PersonFormState extends State<PersonForm> with TickerProviderStateMixin {
+class _PersonFormScreenState extends State<PersonFormScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _userNameController = TextEditingController();
   bool _isLoading = false;
@@ -83,8 +83,8 @@ class _PersonFormState extends State<PersonForm> with TickerProviderStateMixin {
       );
 
       final bool isSuccess = widget.map != null
-          ? await PersonApi().updateUser(personModel, widget.map!['userID'])
-          : await PersonApi().insertUser(personModel);
+          ? await PersonDatabase().updateUser(personModel, widget.map!['userID'])
+          : await PersonDatabase().insertUser(personModel);
 
       if (isSuccess) {
         Navigator.pop(context, true);
@@ -310,3 +310,5 @@ class _PersonFormState extends State<PersonForm> with TickerProviderStateMixin {
     );
   }
 }
+
+

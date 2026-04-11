@@ -1,31 +1,31 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:grocery/PersonForm.dart';
-import 'package:grocery/Person_Api.dart';
+import 'package:grocery/person_form_screen.dart';
+import 'package:grocery/person_database.dart';
 import 'package:grocery/theme_manager.dart';
 
-class PersonScreen extends StatefulWidget {
+class PersonListScreen extends StatefulWidget {
   final int eventId;
   final String eventName;
 
-  PersonScreen({required this.eventId, required this.eventName});
+  PersonListScreen({required this.eventId, required this.eventName});
 
   @override
-  State<PersonScreen> createState() => _PersonScreenState();
+  State<PersonListScreen> createState() => _PersonListScreenState();
 }
 
-class _PersonScreenState extends State<PersonScreen> {
+class _PersonListScreenState extends State<PersonListScreen> {
   late Future<List<dynamic>> _personsFuture;
 
   @override
   void initState() {
     super.initState();
-    _personsFuture = PersonApi().getPersonsByEvent(widget.eventId);
+    _personsFuture = PersonDatabase().getPersonsByEvent(widget.eventId);
   }
 
   void _refreshPersons() {
     setState(() {
-      _personsFuture = PersonApi().getPersonsByEvent(widget.eventId);
+      _personsFuture = PersonDatabase().getPersonsByEvent(widget.eventId);
     });
   }
 
@@ -61,7 +61,7 @@ class _PersonScreenState extends State<PersonScreen> {
                 Navigator.pop(ctx);
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => PersonForm(eventID: widget.eventId, eventName: widget.eventName, map: person)),
+                  MaterialPageRoute(builder: (_) => PersonFormScreen(eventID: widget.eventId, eventName: widget.eventName, map: person)),
                 );
                 if (result == true) _refreshPersons();
               },
@@ -73,7 +73,7 @@ class _PersonScreenState extends State<PersonScreen> {
               color: Colors.redAccent,
               onTap: () async {
                 Navigator.pop(ctx);
-                final deleted = await PersonApi().deleteUser(person['userID']);
+                final deleted = await PersonDatabase().deleteUser(person['userID']);
                 if (deleted) _refreshPersons();
               },
             ),
@@ -129,7 +129,7 @@ class _PersonScreenState extends State<PersonScreen> {
         padding: const EdgeInsets.only(bottom: 20),
         child: FloatingActionButton.extended(
           onPressed: () async {
-            final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => PersonForm(eventID: widget.eventId, eventName: widget.eventName)));
+            final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => PersonFormScreen(eventID: widget.eventId, eventName: widget.eventName)));
             if (result == true) {
               _refreshPersons();
               _showToast('Member added successfully. 🎉');
@@ -278,3 +278,6 @@ class _ActionTile extends StatelessWidget {
     );
   }
 }
+
+
+

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:grocery/SpalshScreenPage.dart';
+import 'package:grocery/splash_screen.dart';
 import 'package:grocery/theme_manager.dart';
 
 void main() async {
@@ -74,9 +74,12 @@ class MyApp extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
           ),
-          home: const SplashScreenPage(),
+          home: const AppSplashScreen(),
         );
       },
     );
   }
 }
+
+
+

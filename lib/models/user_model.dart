@@ -30,7 +30,7 @@ class UserModel {
     );
   }
 
-  // For sending to API (signup)
+  // For sending to API (SignUpScreen)
   Map<String, dynamic> toJson() {
     return {
       'email': email,
@@ -40,3 +40,4 @@ class UserModel {
     };
   }
 }
+

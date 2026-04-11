@@ -1,7 +1,7 @@
-import 'package:grocery/Models/PersonModel.dart';
+import 'package:grocery/models/person_model.dart';
 import 'package:grocery/database_helper.dart';
 
-class PersonApi {
+class PersonDatabase {
   Future<List> getPersonsByEvent(dynamic eventID) async {
     try {
       const int hostId = 1;
@@ -82,3 +82,5 @@ class PersonApi {
     }
   }
 }
+
+
