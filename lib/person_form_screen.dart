@@ -58,8 +58,55 @@ class _PersonFormScreenState extends State<PersonFormScreen> with TickerProvider
   }
 
   Future<void> _pickImage() async {
+    final isLight = ThemeManager.instance.isLightMode;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: isLight ? Colors.white : const Color(0xFF1A1040),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border.all(color: isLight ? Colors.black.withOpacity(0.05) : Colors.white.withOpacity(0.1)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 40, height: 4, decoration: BoxDecoration(color: isLight ? Colors.black26 : Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: Icon(Icons.photo_library_outlined, color: isLight ? const Color(0xFF0F172A) : Colors.white),
+                title: Text('Choose from Gallery', style: TextStyle(color: isLight ? const Color(0xFF0F172A) : Colors.white, fontWeight: FontWeight.bold)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                tileColor: isLight ? Colors.black.withOpacity(0.03) : Colors.white.withOpacity(0.08),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _processImagePicker(ImageSource.gallery);
+                },
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                leading: Icon(Icons.camera_alt_outlined, color: isLight ? const Color(0xFF0F172A) : Colors.white),
+                title: Text('Take a Photo', style: TextStyle(color: isLight ? const Color(0xFF0F172A) : Colors.white, fontWeight: FontWeight.bold)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                tileColor: isLight ? Colors.black.withOpacity(0.03) : Colors.white.withOpacity(0.08),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _processImagePicker(ImageSource.camera);
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _processImagePicker(ImageSource source) async {
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+      final XFile? image = await _picker.pickImage(source: source, imageQuality: 80);
       if (image != null) {
         setState(() {
           _selectedImage = File(image.path);

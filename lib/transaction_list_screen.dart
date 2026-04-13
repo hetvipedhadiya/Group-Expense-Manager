@@ -5,17 +5,17 @@ import 'package:grocery/transaction_database.dart';
 import 'package:grocery/transaction_form_screen.dart';
 import 'package:grocery/theme_manager.dart';
 
-class DashboardScreen extends StatefulWidget {
+class TransactionListScreen extends StatefulWidget {
   final int eventId;
   final String eventName;
 
-  DashboardScreen({required this.eventId, required this.eventName});
+  TransactionListScreen({required this.eventId, required this.eventName});
 
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
+class _DashboardScreenState extends State<TransactionListScreen> with TickerProviderStateMixin {
   Future<List<dynamic>>? _transactionFuture;
   List<dynamic> _persons = [];
   bool _showAll = false;
@@ -93,8 +93,25 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     color: const Color(0xFF1E293B),
                     onTap: () async {
                       Navigator.pop(ctx);
-                      final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionFormScreen(eventID: widget.eventId, eventName: widget.eventName, map: tx)));
-                      if (result == true) _refreshTransactions();
+                      showDialog(
+                        context: context,
+                        builder: (dialogCtx) => AlertDialog(
+                          title: const Text('Edit Transaction'),
+                          content: const Text('Do you want to edit this transaction?'),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(dialogCtx), child: const Text('Cancel')),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.pop(dialogCtx);
+                                final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionFormScreen(eventID: widget.eventId, eventName: widget.eventName, map: tx)));
+                                if (result == true) _refreshTransactions();
+                              },
+                              child: const Text('Edit', style: TextStyle(color: Colors.blue)),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -106,8 +123,25 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     color: Colors.redAccent,
                     onTap: () async {
                       Navigator.pop(ctx);
-                      final deleted = await TransactionDatabase().deleteTransaction(tx['expenseID']);
-                      if (deleted) _refreshTransactions();
+                      showDialog(
+                        context: context,
+                        builder: (dialogCtx) => AlertDialog(
+                          title: const Text('Delete Transaction'),
+                          content: const Text('Are you sure you want to delete this transaction?'),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(dialogCtx), child: const Text('Cancel')),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.pop(dialogCtx);
+                                final deleted = await TransactionDatabase().deleteTransaction(tx['expenseID']);
+                                if (deleted) _refreshTransactions();
+                              },
+                              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 ),

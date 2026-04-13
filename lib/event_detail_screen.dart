@@ -143,7 +143,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
           controller: _tabController,
           children: [
             PersonListScreen(eventName: widget.eventName, eventId: widget.eventId),
-            DashboardScreen(eventName: widget.eventName, eventId: widget.eventId),
+            TransactionListScreen(eventName: widget.eventName, eventId: widget.eventId),
             ReportScreen(eventId: widget.eventId, eventName: widget.eventName),
           ],
         ),
@@ -172,17 +172,68 @@ class PdfReportAPI {
   }) async {
     final pdf = pw.Document();
     pdf.addPage(pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
       build: (context) => [
-        pw.Text('Event Report Summary', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
-        pw.SizedBox(height: 20),
+        pw.Text('Event Report: Summary', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+        pw.SizedBox(height: 10),
+        
+        // Summary Box
+        pw.Container(
+          padding: const pw.EdgeInsets.all(12),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColors.black, width: 1),
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+          ),
+          child: pw.Column(
+            children: [
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [pw.Text('Total Members:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14)), pw.Text(reportData['totalMembers']?.toString() ?? '0', style: const pw.TextStyle(fontSize: 14))]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [pw.Text('Total Income:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14)), pw.Text(reportData['totalIncome']?.toString() ?? '0.0', style: const pw.TextStyle(fontSize: 14))]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [pw.Text('Total Expense:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14)), pw.Text(reportData['totalExpense']?.toString() ?? '0.0', style: const pw.TextStyle(fontSize: 14))]),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [pw.Text('Expense Per Head:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14)), pw.Text(reportData['expensePerHead']?.toString() ?? '0.0', style: const pw.TextStyle(fontSize: 14))]),
+            ]
+          )
+        ),
+        
+        pw.SizedBox(height: 25),
+        
+        // Transactions Table
+        pw.Text('Transactions', style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
+        pw.SizedBox(height: 8),
+        pw.Table.fromTextArray(
+          headers: ['Name', 'Date', 'Type', 'Amount'],
+          data: transactions.map((t) {
+            final dateStr = (t['transactionDate']?.toString() ?? '').split('T')[0];
+            final typeStr = (t['transactionType']?.toString().toLowerCase() == 'credit') ? 'Credit' : 'Debit';
+            return [
+              t['userName']?.toString() ?? 'Member',
+              dateStr,
+              typeStr,
+              t['amount']?.toString() ?? '0',
+            ];
+          }).toList(),
+          cellStyle: const pw.TextStyle(fontSize: 12),
+          headerStyle: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+          border: pw.TableBorder.all(color: PdfColors.black, width: 1),
+          cellAlignment: pw.Alignment.centerLeft,
+        ),
+        
+        pw.SizedBox(height: 25),
+
+        // Member Details Table
+        pw.Text('Member Details', style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
+        pw.SizedBox(height: 8),
         pw.Table.fromTextArray(
           headers: ['Member', 'Income', 'Expense', 'Remaining'],
           data: reportMemberData.map((row) => [
-            row['member'].toString(),
+            row['member']?.toString() ?? '',
             (row['income'] ?? 0).toString(),
             (row['expense'] ?? 0).toString(),
             ((row['income'] ?? 0) - (row['expense'] ?? 0)).toString(),
           ]).toList(),
+          cellStyle: const pw.TextStyle(fontSize: 12),
+          headerStyle: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+          border: pw.TableBorder.all(color: PdfColors.black, width: 1),
+          cellAlignment: pw.Alignment.centerLeft,
         ),
       ],
     ));

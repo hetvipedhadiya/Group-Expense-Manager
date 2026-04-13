@@ -59,11 +59,28 @@ class _PersonListScreenState extends State<PersonListScreen> {
               color: const Color(0xFF1E293B),
               onTap: () async {
                 Navigator.pop(ctx);
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => PersonFormScreen(eventID: widget.eventId, eventName: widget.eventName, map: person)),
+                showDialog(
+                  context: context,
+                  builder: (dialogCtx) => AlertDialog(
+                    title: const Text('Edit Member Info'),
+                    content: const Text('Do you want to edit this member?'),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(dialogCtx), child: const Text('Cancel')),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.pop(dialogCtx);
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => PersonFormScreen(eventID: widget.eventId, eventName: widget.eventName, map: person)),
+                          );
+                          if (result == true) _refreshPersons();
+                        },
+                        child: const Text('Edit', style: TextStyle(color: Colors.blue)),
+                      ),
+                    ],
+                  ),
                 );
-                if (result == true) _refreshPersons();
               },
             ),
             const SizedBox(height: 12),
@@ -73,8 +90,25 @@ class _PersonListScreenState extends State<PersonListScreen> {
               color: Colors.redAccent,
               onTap: () async {
                 Navigator.pop(ctx);
-                final deleted = await PersonDatabase().deleteUser(person['userID']);
-                if (deleted) _refreshPersons();
+                showDialog(
+                  context: context,
+                  builder: (dialogCtx) => AlertDialog(
+                    title: const Text('Remove Member'),
+                    content: const Text('Are you sure you want to remove this member?'),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(dialogCtx), child: const Text('Cancel')),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.pop(dialogCtx);
+                          final deleted = await PersonDatabase().deleteUser(person['userID']);
+                          if (deleted) _refreshPersons();
+                        },
+                        child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
             const SizedBox(height: 12),

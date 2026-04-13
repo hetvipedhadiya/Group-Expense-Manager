@@ -5,12 +5,12 @@ class ThemeManager {
   static final ThemeManager instance = ThemeManager._internal();
   ThemeManager._internal();
 
-  final ValueNotifier<ThemeMode> themeMode = ValueNotifier(ThemeMode.dark);
+  final ValueNotifier<ThemeMode> themeMode = ValueNotifier(ThemeMode.light);
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
-    final bool isLight = prefs.getBool('isLightMode') ?? false;
-    themeMode.value = isLight ? ThemeMode.light : ThemeMode.dark;
+    await prefs.setBool('isLightMode', true); // Force it
+    themeMode.value = ThemeMode.light;
   }
 
   Future<void> toggleTheme() async {
