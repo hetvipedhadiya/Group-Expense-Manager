@@ -2,6 +2,7 @@ import 'package:grocery/models/insert_event_model.dart';
 import 'package:grocery/database_helper.dart';
 
 class EventDatabase {
+  /// Fetches all events from the database globally.
   Future<List> getAllEvent() async {
     try {
       final db = await DatabaseHelper.instance.database;
@@ -13,6 +14,7 @@ class EventDatabase {
     }
   }
 
+  /// Fetches all events owned by the current active host along with their total transaction amounts.
   Future<List> fetchEventsByHostId() async {
     try {
       const int hostId = 1;
@@ -31,6 +33,7 @@ class EventDatabase {
     }
   }
 
+  /// Fetches a specific event by its [eventID], ensuring it belongs to the active host.
   Future<List> getById(dynamic eventID) async {
     try {
       const int hostId = 1;
@@ -47,6 +50,7 @@ class EventDatabase {
     }
   }
 
+  /// Deletes a specific event from the database based on the provided [eventID].
   Future<bool> deleteEvent(dynamic eventID) async {
     try {
       final db = await DatabaseHelper.instance.database;
@@ -62,6 +66,7 @@ class EventDatabase {
     }
   }
 
+  /// Inserts a new event into the database and associates it with the active host.
   Future<bool> insertEvent(Event event) async {
     try {
       const int hostId = 1;
@@ -76,6 +81,7 @@ class EventDatabase {
     }
   }
 
+  /// Updates an existing event's details in the database using the provided [eventID].
   Future<bool> updateData(Event event, dynamic eventID) async {
     try {
       const int hostId = 1;

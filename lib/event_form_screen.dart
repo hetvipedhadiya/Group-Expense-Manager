@@ -180,7 +180,7 @@ class _EventFormScreenState extends State<EventFormScreen> with TickerProviderSt
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.calendar_today, size: 18, color: Colors.blue),
+                                const Icon(Icons.calendar_today, size: 18, color: Color(0xFF1E293B)),
                                 const SizedBox(width: 12),
                                 Text(
                                   _selectedDate == null ? 'Select Date' : DateFormat('dd MMM yyyy').format(_selectedDate!),

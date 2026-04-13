@@ -7,12 +7,14 @@ class DatabaseHelper {
 
   DatabaseHelper._init();
 
+  /// Retrieves or initializes the singleton instance of the database.
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDB('expense_manager.db');
     return _database!;
   }
 
+  /// Initializes the SQLite database, configures foreign keys, and handles migrations.
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
@@ -48,6 +50,7 @@ class DatabaseHelper {
     return db;
   }
 
+  /// Creates all required database tables including users, events, persons, and transactions.
   Future _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE users (
@@ -106,6 +109,7 @@ class DatabaseHelper {
     ''');
   }
 
+  /// Closes the active database connection when it is no longer needed.
   Future<void> close() async {
     final db = await instance.database;
     db.close();

@@ -2,6 +2,7 @@ import 'package:grocery/models/transaction_model.dart';
 import 'package:grocery/database_helper.dart';
 
 class TransactionDatabase {
+  /// Retrieves all transaction records globally and parses them into TransactionModel objects.
   Future<List<TransactionModel>> getAllTransaction() async {
     try {
       final db = await DatabaseHelper.instance.database;
@@ -12,6 +13,7 @@ class TransactionDatabase {
     }
   }
 
+  /// Retrieves all transactions for a specific [eventID], joining person and event tables to get comprehensive details.
   Future<List<dynamic>> getTransactionByEvent(dynamic eventID) async {
     try {
       const int hostId = 1;
@@ -40,6 +42,7 @@ class TransactionDatabase {
     }
   }
 
+  /// Inserts a new transaction into the database under the current host.
   Future<bool> insertTransaction(TransactionModel transaction) async {
     try {
       const int hostId = 1;
@@ -54,6 +57,7 @@ class TransactionDatabase {
     }
   }
 
+  /// Updates an existing transaction's details in the database using its [expenseID].
   Future<bool> updateTransaction(TransactionModel transaction, int expenseID) async {
     try {
       const int hostId = 1;
@@ -73,6 +77,7 @@ class TransactionDatabase {
     }
   }
 
+  /// Deletes a specific transaction from the database based on its [transactionID].
   Future<bool> deleteTransaction(int transactionID) async {
     try {
       final db = await DatabaseHelper.instance.database;
@@ -88,6 +93,7 @@ class TransactionDatabase {
     }
   }
 
+  /// Retrieves a list of persons acting as a dropdown lookup source for assigning a new transaction to a member.
   Future<List<dynamic>> getUserDropdown(int eventID) async {
     try {
       const int hostId = 1;
