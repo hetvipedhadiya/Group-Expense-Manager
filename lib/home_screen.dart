@@ -134,8 +134,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  _HeaderActionBtn(icon: Icons.share_outlined, onTap: () => Share.share('Join me on Expense Manager!')),
-                                  const SizedBox(width: 8),
+                                  _HeaderActionBtn(
+                                    icon: Icons.share_outlined,
+                                    onTap: () => Share.share(
+                                      'Join me on Group Expense Manager!\n\nhttps://play.google.com/store/apps/details?id=com.aswdc_expense_manager',
+                                    ),
+                                  ),
+                                    const SizedBox(width: 8),
                                     _HeaderActionBtn(icon: Icons.info_outline, onTap: () {
                                       Navigator.push(context, MaterialPageRoute(builder: (_) => const AppDeveloperScreen()));
                                     }),
